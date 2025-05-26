@@ -95,3 +95,56 @@ class Magazine:
         """
         CURSOR.execute(sql, (category, ))
         CONN.commit()
+        
+    def contributors(self):
+        """Find all authors who have written for a specific magazine"""
+        sql = """
+            SELECT *
+            FROM authors
+            INNER JOIN articles AS a
+            ON authors.id = a.author_id
+            WHERE a.magazine_id = ?
+        """
+        return [author.name for author in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def articles(self):
+        """Returns list of all articles published in the magazine (using SQL)"""
+        sql = """
+            SELECT *
+            FROM articles
+            WHERE magazine_id = ?
+        """
+        return [article for article in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def article_titles(self):
+        """Returns list of titles of all articles published in the magazine (using SQL)"""
+        sql = """
+            SELECT title
+            FROM articles
+            WHERE magazine_id = ?
+        """
+        return [article for article in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def contributing_authors(self):
+        """Returns list of authors with more than 2 articles in the magazine"""
+        sql = """
+            SELECT authors.name, COUNT(articles.id)
+            FROM authors, articles
+            INNER JOIN articles AS a
+            ON authors.id = a.author_id
+            WHERE a.magazine_id = ? 
+            GROUP BY name 
+            WHERE COUNT(articles.id) > 2
+        """
+        return [author.name for author in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def total_articles(self):
+        """Count the number of articles in each magazine"""
+        sql = """
+            SELECT COUNT(id)
+            FROM articles
+            WHERE magazine_id = ?
+        """
+        
+    
+    

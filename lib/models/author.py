@@ -91,3 +91,22 @@ class Author:
             WHERE a.author_id = ?
         """
         return [article.name for article in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def add_article(self, magazine, title):
+        from article import Article
+        Article(title, self.id, magazine.id)
+        
+    def topic_areas(self):
+        """Returns unique list of categories of magazines the author has contributed to"""
+        sql = """
+            SELECT category
+            FROM magazines AS m
+            INNER JOIN articles AS a 
+            ON m.id = a.magazine_id
+            WHERE a.author_id = ?
+        """
+        return [article.name for article in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def most_contributing_author(self):
+        """Find the author who has written the most articles"""
+        pass
