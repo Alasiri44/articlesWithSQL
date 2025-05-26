@@ -73,4 +73,21 @@ class Author:
         CONN.commit()
         
     def articles(self):
-        
+        """Get all articles written by a specific author"""
+        sql = """
+            SELECT *
+            FROM articles
+            WHERE author_id = ?
+        """
+        return [article.title for article in CURSOR.execute(sql, (self.id,) ).fetchall()]
+    
+    def magazines(self):
+        """Find all magazines a specific author has contributed to"""
+        sql = """
+            SELECT *
+            FROM magazines AS m
+            INNER JOIN articles AS a 
+            ON m.id = a.magazine_id
+            WHERE a.author_id = ?
+        """
+        return [article.name for article in CURSOR.execute(sql, (self.id,) ).fetchall()]

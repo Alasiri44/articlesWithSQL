@@ -44,7 +44,9 @@ class Article:
         """
         CURSOR.execute(sql, (self.title, self.author_id, self.magazine_id ))
         CONN.commit()
+        
         self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
         
     @classmethod
     def find_by_id(cls, id):
