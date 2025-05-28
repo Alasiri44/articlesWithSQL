@@ -1,61 +1,40 @@
-from connection import get_connection
+from lib.db.connection import get_connection
 
-def seed_db():
+def seed():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Clear existing data
-    cursor.executescript("""
-    DELETE FROM articles;
-    DELETE FROM magazines;
-    DELETE FROM authors;
-    """)
+    # Clear tables
+    cursor.execute("DELETE FROM articles")
+    cursor.execute("DELETE FROM authors")
+    cursor.execute("DELETE FROM magazines")
 
-    # Insert Authors
-    cursor.executemany("""
-    INSERT INTO authors (name) VALUES (?);
-    """, [
-        ("Chinua Achebe",),
-        ("Margaret Atwood",),
-        ("George Orwell",),
-        ("Zadie Smith",),
-        ("Toni Morrison",),
-    ])
+    # Insert authors
+    cursor.execute("INSERT INTO authors (name) VALUES ('Chinua Achebe')")
+    chinua_id = cursor.lastrowid
+    cursor.execute("INSERT INTO authors (name) VALUES ('Ngugi wa Thiong\'o')")
+    ngugi_id = cursor.lastrowid
+    cursor.execute("INSERT INTO authors (name) VALUES ('Margaret Atwood')")
+    atwood_id = cursor.lastrowid
 
-    # Insert Magazines
-    cursor.executemany("""
-    INSERT INTO magazines (name, category) VALUES (?, ?);
-    """, [
-        ("The Atlantic", "Politics"),
-        ("National Geographic", "Science"),
-        ("New Yorker", "Literature"),
-        ("Wired", "Technology"),
-        ("Time", "News"),
-    ])
+    # Insert magazines
+    cursor.execute("INSERT INTO magazines (name, category) VALUES ('African Times', 'Culture')")
+    african_times_id = cursor.lastrowid
+    cursor.execute("INSERT INTO magazines (name, category) VALUES ('Global Voice', 'Politics')")
+    global_voice_id = cursor.lastrowid
+    cursor.execute("INSERT INTO magazines (name, category) VALUES ('Literary Digest', 'Literature')")
+    digest_id = cursor.lastrowid
 
-    # Insert Articles
-    cursor.executemany("""
-    INSERT INTO articles (title, author_id, magazine_id) VALUES (?, ?, ?);
-    """, [
-        ("The Future of AI", 3, 4),
-        ("Under the Baobab", 1, 3),
-        ("Digital Freedom", 3, 1),
-        ("Literary Queens", 2, 3),
-        ("Race and Reality", 5, 5),
-        ("Feminism in the North", 2, 5),
-        ("Beyond Borders", 4, 2),
-        ("Nature Speaks", 4, 2),
-        ("Data and Dignity", 3, 4),
-        ("Voices of Africa", 1, 1),
-        ("Through the Lens", 5, 2),
-        ("Power and People", 5, 1),
-        ("Poetry in Crisis", 2, 3),
-        ("Youth in Tech", 4, 4),
-        ("Migrations", 1, 2),
-    ])
+    # Insert articles
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('The Roots of Identity', ?, ?)", (chinua_id, african_times_id))
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('Colonial Legacy', ?, ?)", (chinua_id, global_voice_id))
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('Post-Colonial Lens', ?, ?)", (ngugi_id, african_times_id))
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('Eco Fiction', ?, ?)", (atwood_id, digest_id))
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('Feminist Voice', ?, ?)", (atwood_id, global_voice_id))
+    cursor.execute("INSERT INTO articles (title, author_id, magazine_id) VALUES ('Dystopian Visions', ?, ?)", (atwood_id, global_voice_id))
 
     conn.commit()
     conn.close()
-    print("🌱 Seeded the database with dummy data.")
-    
-seed_db()
+
+if __name__ == "__main__":
+    seed()
